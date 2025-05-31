@@ -1,0 +1,144 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hamster Combat Mini-Game</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: #f0f0f0;
+    margin: 20px;
+  }
+  #game {
+    background: white;
+    border: 2px solid #ccc;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 10px;
+  }
+  .hp-bar {
+    height: 20px;
+    background: #ddd;
+    border-radius: 10px;
+    margin: 10px 0;
+    position: relative;
+  }
+  .hp-fill {
+    height: 100%;
+    background: #4caf50;
+    border-radius: 10px;
+    width: 100%;
+    transition: width 0.3s ease;
+  }
+  button {
+    margin: 10px 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+  }
+  #log {
+    height: 100px;
+    overflow-y: auto;
+    background: #eee;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: left;
+  }
+</style>
+</head>
+<body>
+  <h1>Hamster Combat Mini-Game</h1>
+  <div id="game">
+    <div>
+      <strong>Your Hamster HP:</strong>
+      <div class="hp-bar"><div id="playerHP" class="hp-fill"></div></div>
+    </div>
+    <div>
+      <strong>Enemy Hamster HP:</strong>
+      <div class="hp-bar"><div id="enemyHP" class="hp-fill"></div></div>
+    </div>
+    <div>
+      <button id="attackBtn">Attack</button>
+      <button id="defendBtn">Defend</button>
+    </div>
+    <div id="log"></div>
+  </div>
+
+  <script>
+    const player = { hp: 100, defending: false };
+    const enemy = { hp: 100 };
+    const playerHPBar = document.getElementById('playerHP');
+    const enemyHPBar = document.getElementById('enemyHP');
+    const log = document.getElementById('log');
+
+    function updateHP() {
+      playerHPBar.style.width = player.hp + '%';
+      enemyHPBar.style.width = enemy.hp + '%';
+      if (player.hp <= 0 || enemy.hp <= 0) {
+        endGame();
+      }
+    }
+
+    function logMessage(msg) {
+      log.innerHTML += msg + '<br>';
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function enemyAttack() {
+      let damage = Math.floor(Math.random() * 15) + 5;
+      if (player.defending) {
+        damage = Math.floor(damage / 2);
+      }
+      player.hp -= damage;
+      logMessage(`Enemy attacks you for ${damage} damage.`);
+      player.defending = false;
+      updateHP();
+    }
+
+    function playerAttack() {
+      let damage = Math.floor(Math.random() * 20) + 10;
+      enemy.hp -= damage;
+      logMessage(`You attack enemy for ${damage} damage.`);
+      updateHP();
+      if (enemy.hp > 0) {
+        setTimeout(enemyAttack, 1000);
+      }
+    }
+
+    function playerDefend() {
+      player.defending = true;
+      logMessage('You defend and reduce incoming damage.');
+      setTimeout(enemyAttack, 1000);
+    }
+
+    function endGame() {
+      if (player.hp <= 0 && enemy.hp <= 0) {
+        logMessage('It's a tie!');
+      } else if (player.hp <= 0) {
+        logMessage('You lost! Better luck next time.');
+      } else {
+        logMessage('You won! Congrats!');
+      }
+      attackBtn.disabled = true;
+      defendBtn.disabled = true;
+    }
+
+    const attackBtn = document.getElementById('attackBtn');
+    const defendBtn = document.getElementById('defendBtn');
+
+    attackBtn.onclick = () => {
+      playerAttack();
+    };
+
+    defendBtn.onclick = () => {
+      playerDefend();
+    };
+
+    updateHP();
+    logMessage('Game started! Choose your action.');
+  </script>
+</body>
+</html>
